@@ -8,9 +8,9 @@ class NetworkManager extends GetxController {
   static NetworkManager get instance => Get.find();
 
   final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
 
-  final Rx<ConnectivityResult> _conneectionStatus = ConnectivityResult.none.obs;
+  final RxList<ConnectivityResult> _conneectionStatus = [ConnectivityResult.none].obs;
 
   @override
   void onInit() {
@@ -19,9 +19,9 @@ class NetworkManager extends GetxController {
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
 
-  Future _updateConnectionStatus(ConnectivityResult result) async {
+  Future _updateConnectionStatus(List<ConnectivityResult> result) async {
     _conneectionStatus.value = result;
-    if (_conneectionStatus.value == ConnectivityResult.none) {
+    if (_conneectionStatus.contains(ConnectivityResult.none)) {
       return KLoader.customToast(massage: 'No Internet Connection');
     }
   }
@@ -29,7 +29,7 @@ class NetworkManager extends GetxController {
   Future<bool> isConnected() async {
     try {
       final result = await _connectivity.checkConnectivity();
-      if (result == ConnectivityResult.none) {
+      if (result.contains(ConnectivityResult.none)) {
         return false;
       } else {
         return true;
